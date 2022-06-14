@@ -5,6 +5,16 @@ const pizzaController = {
     getAllPizza(req, res) {
         // Uses Mongoose find() method to get all the pizzas
         Pizza.find({})
+        // populate will generate the actual content of comments when the dat for piza is pulled
+            .populate({
+                path: 'comments',
+                // States that we do not want the __v content from comments
+                // the - denotes we don't want otherwise it would only pull __v
+                select: '-__v'
+            })
+            .select('-__v')
+            // This will sort the object in DESC order
+            .sort({ _id: -1 })
             .then(dbPizzaData => res.json(dbPizzaData))
             .catch(err => {
                 console.log(err);

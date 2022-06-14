@@ -18,7 +18,27 @@ const PizzaSchema = new Schema({
         default: 'Large'
     },
     // The [] represents an array, which can be used as well
-    toppings: []
+    toppings: [],
+    comments: [
+        {
+            type: Schema.Types.ObjectId,
+            // Tells Pizza which document to search for
+            ref: 'Comment'
+        }
+    ]
+},
+{
+    // States that a virtual is used
+    toJSON: {
+        virtuals: true,
+    },
+    id: false
+});
+
+// Gets the total number of comments for a pizza
+PizzaSchema.virtual('commentCount').get(function() {
+    // returns the amount of comments in the array
+    return this.comments.length;
 });
 
 // Creates the Pizza model using PizzaSchema
