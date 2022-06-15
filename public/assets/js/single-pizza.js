@@ -9,6 +9,30 @@ const $newCommentForm = document.querySelector('#new-comment-form');
 
 let pizzaId;
 
+function getPizza() {
+  // Get the id for the pizza
+  const searchParams = new URLSearchParams(document.location.search.substring(1));
+  const pizzaId = searchParams.get('id');
+
+  // Get the info for the pizza
+  fetch(`/api/pizzas/${pizzaId}`)
+  .then(response => {
+    // check for a 4xx or 5xx error from server
+    if (!response.ok) {
+      throw new Error({ message: 'Could not fetch that Pizza bro!' });
+    }
+    return response.json();
+  })
+  .then(printPizza)
+  .catch(err => {
+    console.log(err);
+    alert('Cannpt find a pizza with this ID! Gotta send you back Bro');
+    // Sends the user to the homepage as long as the current page has a previous page
+    // will behave similiarly to pressing the back button
+    window.history.back();
+  });
+}
+
 function printPizza(pizzaData) {
   console.log(pizzaData);
 
@@ -87,6 +111,24 @@ function handleNewCommentSubmit(event) {
   }
 
   const formData = { commentBody, writtenBy };
+
+  // Pulls the id for the comment to make a new post
+  fetch(`/api/comments/${pizzaId}`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(formData)
+  })
+  .then(commentResponse => {
+    console.log(commentResponse);
+    // Reloads the data to display a new comment
+    location.reload();
+  })
+  .catch(err => {
+    console.log(err);
+  });
 }
 
 function handleNewReplySubmit(event) {
@@ -106,6 +148,28 @@ function handleNewReplySubmit(event) {
   }
 
   const formData = { writtenBy, replyBody };
+
+  fetch(`/api/comments/${pizzaId}/${commentId}`, {
+    method: 'PUT',
+    headers: {
+      Accept: 'application/json',
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify(formData)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Something Went Wrong!');
+    }
+    response.json();
+  })
+  .then(commentResponse => {
+    console.log(commentResponse);
+    location.reload();
+  })
+  .catch(err => {
+    console.log(err);
+  })
 }
 
 $backBtn.addEventListener('click', function() {
@@ -114,3 +178,5 @@ $backBtn.addEventListener('click', function() {
 
 $newCommentForm.addEventListener('submit', handleNewCommentSubmit);
 $commentSection.addEventListener('submit', handleNewReplySubmit);
+
+getPizza();
