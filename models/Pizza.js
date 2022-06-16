@@ -4,10 +4,17 @@ const dateFormat = require('../utils/dateFormat');
 const PizzaSchema = new Schema({
     pizzaName: {
         // Uses MongoDB and Mongoose to set type 
-        type: String
+        type: String, 
+        // Makes the pizzaName required
+        // Can also provide a text message to the user if the pizzaName is not provided
+        required: true,
+        // Removes the whitespace before and after the input
+        trim: true
     },
     createdBy: {
-        type: String
+        type: String,
+        required: true,
+        trim: true
     },
     createdAt: {
         type: Date,
@@ -18,6 +25,10 @@ const PizzaSchema = new Schema({
     },
     size: {
         type: String,
+        required: true,
+        // enumerable
+        // Creates an array that can be iterated through
+        enum: ['Personal', 'Small', 'Medium', 'Large', 'Extra Large'],
         default: 'Large'
     },
     // The [] represents an array, which can be used as well
